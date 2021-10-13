@@ -1,10 +1,7 @@
-(ns example.core
+(ns example.current
   (:require [reacl-c.core :as c :include-macros true]
             [reacl-c.main :as main]
             [reacl-c.dom :as dom]))
-
-(defn init []
-  (println "hello from clojurescript"))
 
 (c/defn-item personal-info []
   (c/local-state
@@ -57,6 +54,3 @@
      (fn [state action]
        (c/return :state (merge state action))))))
 
-(main/run (.getElementById js/document "app")
-  signup-process
-  {:initial-state {:step :personal-info}})
