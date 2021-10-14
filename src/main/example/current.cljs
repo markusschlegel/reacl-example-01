@@ -3,6 +3,21 @@
             [reacl-c.main :as main]
             [reacl-c.dom :as dom]))
 
+(define-record-type CommitAction
+                    make-commit-action
+                    commit-action?
+                    [a commit-action-payload
+                     b commit-action-other-field
+                     c commit-action-noch-einanderes])
+
+
+(defrecord CommitAction [payload])
+(def make-commit-action ->CommitAction)
+(defn commit-action? [x] (instance? CommitAction x))
+(defn commit-action-payload [ca] (:payload ca))
+
+(.-payload foo)
+
 (c/defn-item personal-info []
   (c/local-state
    {:name "" :email ""}
@@ -17,7 +32,7 @@
                (dom/input {:placeholder "email"
                            :value (:email inner)
                            :onChange (fn [[outter inner] e] (c/return :state [outter (assoc inner :email (.. e -target -value))]))})
-               (dom/button {:onclick (fn [state action] (c/return :action (merge {:step :verifaction-code} inner)))
+               (dom/button {:onclick (fn [state action] (c/return :action (make-commit-action inner)))
                             :class "confirm-button"
                             :disabled (or (< (count (:name inner)) 1) (< (count (:email inner)) 1))}
                            "Continue"))))))
@@ -47,10 +62,16 @@
      (dom/div
       (dom/samp (pr-str state))
       (dom/h2 "Signup:")
+      
       (case (:step state)
         :personal-info (personal-info)
         :verifaction-code (create-and-send-verification-code)
         :done (dom/h2 "Successfully registered!")))
      (fn [state action]
+       (cond
+         (commit-action? action)
+         ; ... calculate next state
+         (case (:step state)
+           :personal-info (c/return :state {:step :verification-code :zeug (commit-action-payload action)}))
        (c/return :state (merge state action))))))
 
