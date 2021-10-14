@@ -1,12 +1,13 @@
 (ns example.app
   (:require [reacl-c.main :as main]
-            [example.current :as current]))
+            [example.current :as current]
+            [example.future :as future]))
 
 (defn init []
   (println "hello from clojurescript"))
 
 (main/run (.getElementById js/document "app")
-  current/signup-process
+  future/signup-process
   {:initial-state {:step :personal-info}})
 
 
